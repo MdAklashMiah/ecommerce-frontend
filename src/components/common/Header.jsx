@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, Search, User, Heart, ShoppingCart, X } from "lucide-react";
 import Container from "./Container";
@@ -8,6 +8,29 @@ import Container from "./Container";
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive] = useState("HOME");
+
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const loginRef = useRef();
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (loginRef.current && !loginRef.current.contains(event.target)) {
+        setIsLoginOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ESC key closes modal
+  useEffect(() => {
+    function handleEsc(event) {
+      if (event.key === "Escape") setIsLoginOpen(false);
+    }
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const navLinks = [
     "HOME",
@@ -18,11 +41,10 @@ const Header = () => {
     "PAGES",
   ];
 
-  // Path generator
   const getPath = (link) => (link === "HOME" ? "/" : `/${link.toLowerCase()}`);
 
   return (
-    <header className="w-full shadow-sm bg-white fixed top-0 z-50">
+    <header className="w-full shadow-sm bg-white fixed top-0 left-0 z-50">
       <Container>
         <div className="w-full mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo */}
@@ -31,25 +53,20 @@ const Header = () => {
             <span className="w-3 h-3 bg-red-600 rounded-full"></span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex space-x-10 text-sm font-medium text-gray-800">
             {navLinks.map((link) => (
               <Link
                 key={link}
                 href={getPath(link)}
                 onClick={() => setActive(link)}
-                className={`
-                relative tracking-wide transition-all
-                ${
+                className={`relative tracking-wide transition-all ${
                   active === link
                     ? "text-black"
                     : "text-gray-700 hover:text-black"
-                }
-              `}
+                }`}
               >
                 {link}
-
-                {/* Active underline */}
                 {active === link && (
                   <span className="absolute left-0 -bottom-1 w-full h-[1.5px] bg-black rounded-full"></span>
                 )}
@@ -60,10 +77,14 @@ const Header = () => {
           {/* Icons */}
           <div className="flex items-center space-x-6 text-gray-700">
             <Search className="w-5 h-5 cursor-pointer hover:text-black" />
-            <User className="w-5 h-5 cursor-pointer hover:text-black" />
+
+            {/* User Button */}
+            <button onClick={() => setIsLoginOpen(true)}>
+              <User className="w-5 h-5 cursor-pointer hover:text-black" />
+            </button>
+
             <Heart className="w-5 h-5 cursor-pointer hover:text-black" />
 
-            {/* Cart */}
             <div className="relative cursor-pointer">
               <ShoppingCart className="w-5 h-5 hover:text-black" />
               <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold w-4 h-4 flex items-center justify-center rounded-full">
@@ -71,7 +92,7 @@ const Header = () => {
               </span>
             </div>
 
-            {/* Mobile Menu Icon */}
+            {/* Mobile Menu */}
             <div className="md:hidden">
               <Menu
                 className="w-6 h-6 cursor-pointer"
@@ -82,9 +103,52 @@ const Header = () => {
         </div>
       </Container>
 
-      {/* ---------------- MOBILE DRAWER MENU ---------------- */}
+      {/* ----------- LOGIN MODAL (CENTERED) ----------- */}
+      {isLoginOpen && (
+        <div className="fixed inset-0 shadow-2xl backdrop-blur-xs flex items-center justify-center z-[999]">
+          <div
+            ref={loginRef}
+            className="bg-white w-full max-w-md px-6 py-8 rounded-xl shadow-xl animate-fadeIn relative"
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsLoginOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h2 className="text-2xl font-semibold text-center mb-6">
+              Welcome Back
+            </h2>
+
+            <form className="flex flex-col gap-4">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="border px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/70"
+              />
+
+              <input
+                type="password"
+                placeholder="Password"
+                className="border px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/70"
+              />
+
+              <button
+                type="submit"
+                className="bg-black text-white py-3 rounded-lg hover:bg-gray-900 mt-2"
+              >
+                Login
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ----------- MOBILE DRAWER ----------- */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-white shadow-lg z-[999] transform transition-transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-72 bg-white shadow-lg z-[998] transform transition-transform duration-300 ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -93,7 +157,6 @@ const Header = () => {
           <X className="cursor-pointer" onClick={() => setMobileOpen(false)} />
         </div>
 
-        {/* Mobile Menu Links */}
         <div className="flex flex-col px-6 mt-4 space-y-6 text-gray-800">
           {navLinks.map((link) => (
             <Link
@@ -103,7 +166,7 @@ const Header = () => {
                 setActive(link);
                 setMobileOpen(false);
               }}
-              className={`text-lg text-left transition ${
+              className={`text-lg transition ${
                 active === link
                   ? "text-black font-semibold"
                   : "hover:text-black"
@@ -113,20 +176,11 @@ const Header = () => {
             </Link>
           ))}
         </div>
-
-        {/* Mobile Icons */}
-        <div className="px-6 mt-10 border-t pt-6 flex space-x-6">
-          <Search className="w-6 h-6 cursor-pointer hover:text-black" />
-          <User className="w-6 h-6 cursor-pointer hover:text-black" />
-          <Heart className="w-6 h-6 cursor-pointer hover:text-black" />
-          <ShoppingCart className="w-6 h-6 cursor-pointer hover:text-black" />
-        </div>
       </div>
 
-      {/* BACKDROP */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-[998]"
+          className="fixed inset-0 bg-black bg-opacity-40 z-[997]"
           onClick={() => setMobileOpen(false)}
         ></div>
       )}

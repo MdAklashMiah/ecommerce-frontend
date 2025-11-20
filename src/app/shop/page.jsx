@@ -1,5 +1,4 @@
 import Container from "@/components/common/Container";
-import Banner from "@/components/home/Banner";
 import Pagination from "@/components/shop/Pagination";
 import ProductCard from "@/components/shop/ProductCard";
 import ShopBanner from "@/components/shop/ShopBanner";
