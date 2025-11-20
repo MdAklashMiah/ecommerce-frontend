@@ -53,7 +53,7 @@ export default function Sidebar() {
               ].map((item) => (
                 <li
                   key={item}
-                  className="hover:text-white cursor-pointer"
+                  className="hover:text-black hover:font-semibold transition-all cursor-pointer"
                 >
                   {item}
                 </li>

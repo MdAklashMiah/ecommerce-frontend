@@ -133,6 +133,7 @@ const TopCollection = () => {
         <div className="relative px-10">
           <Slider {...settings}>
             {products.map((p) => (
+              <a href="/product">
               <div key={p.id} className="pr-4">
                 <div className="group relative bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition">
 
@@ -190,6 +191,7 @@ const TopCollection = () => {
                   </div>
                 </div>
               </div>
+              </a>
             ))}
           </Slider>
         </div>

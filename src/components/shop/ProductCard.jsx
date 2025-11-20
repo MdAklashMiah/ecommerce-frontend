@@ -8,9 +8,10 @@ export default function ProductCard({
 }) {
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg  flex flex-col transition-all">
+      <a href="/product">
       {/* Image */}
       <div className="w-full bg-gray-50">
-        <a href="#" className="block">
+        <a href="/product" className="block">
           <img
             src={"/images/products/images.png"}
             alt={title}
@@ -90,6 +91,7 @@ export default function ProductCard({
           </button>
         </div>
       </div>
+      </a>
     </div>
   );
 }
