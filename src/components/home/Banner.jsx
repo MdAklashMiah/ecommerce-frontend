@@ -18,7 +18,7 @@ const Banner = () => {
   };
 
   return (
-    <section className="py-16">
+    <section className="pb-16 pt-32">
       <Container>
         <Slider {...settings}>
           <div>

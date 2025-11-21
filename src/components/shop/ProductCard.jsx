@@ -85,7 +85,7 @@ export default function ProductCard({
           {/* Add to Cart Button */}
           <button
             type="button"
-            className="text-sm font-medium px-2 cursor-pointer min-h-[36px] w-full bg-dark text-white tracking-wide ml-auto outline-0 border-0 rounded-sm"
+            className="text-sm font-medium px-2 cursor-pointer min-h-[36px] w-full bg-secondary text-white tracking-wide ml-auto outline-0 border-0 rounded-sm"
           >
             Add to cart
           </button>

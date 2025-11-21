@@ -43,7 +43,7 @@ export default function ProductView() {
   };
 
   return (
-    <section className="bg-white text-gray-900 py-24">
+    <section className="bg-white text-gray-900 pb-16 pt-36">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-2 gap-14">
         {/* LEFT — PRODUCT IMAGES */}
         <div>
