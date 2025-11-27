@@ -38,7 +38,7 @@ export default function SearchBar() {
         </button>
 
         {openBrowse && (
-          <div className="absolute top-12 left-0 bg-white shadow-md border w-full rounded-md z-20">
+          <div className="absolute top-12 left-0 bg-white shadow-md border w-full  rounded-md z-20">
             {browseItems.map((item, i) => (
               <p
                 key={i}
