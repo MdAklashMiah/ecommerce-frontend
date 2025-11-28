@@ -1,5 +1,6 @@
 import Header from "@/components/common/Header";
 import Banner from "@/components/home/Banner";
+import CustomerReview from "@/components/home/CustomerReview";
 import FeatureProducts from "@/components/home/FeatureProducts";
 import LatestProducts from "@/components/home/LatestProduct";
 import LimitedEdition from "@/components/home/LimitedEdition";
@@ -14,6 +15,7 @@ const page = () => {
       <LatestProducts />
       <FeatureProducts/>
       <LimitedEdition/>
+      <CustomerReview/>
     </main>
   );
 };
