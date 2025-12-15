@@ -3,6 +3,7 @@
 import Slider from "react-slick";
 import Image from "next/image";
 import { useState } from "react";
+import Container from "../common/Container";
 
 export default function CustomerReview() {
   const [active, setActive] = useState(0);
@@ -78,11 +79,12 @@ export default function CustomerReview() {
         What Our Customers Say
       </h2>
 
-      <Slider {...settings}>
-        {reviews.map((r, i) => (
-          <div key={r.id} className="px-3">
-            <div
-              className={`
+      <Container>
+        <Slider {...settings}>
+          {reviews.map((r, i) => (
+            <div key={r.id} className=" px-3">
+              <div
+                className={`
                 bg-white border border-gray-200 rounded-2xl shadow-md p-8 text-center transition-all duration-500
                 ${
                   active === i
@@ -90,25 +92,26 @@ export default function CustomerReview() {
                     : "scale-90 opacity-50"
                 }
               `}
-            >
-              <div className="flex justify-center mb-4">
-                <Image
-                  src={r.img}
-                  width={80}
-                  height={80}
-                  alt={r.name}
-                  className="rounded-full"
-                />
+              >
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src={r.img}
+                    width={80}
+                    height={80}
+                    alt={r.name}
+                    className="rounded-full"
+                  />
+                </div>
+
+                <h3 className="font-semibold text-lg">{r.name}</h3>
+                <p className="text-sm text-gray-500">{r.role}</p>
+
+                <p className="mt-4 text-gray-600">{r.message}</p>
               </div>
-
-              <h3 className="font-semibold text-lg">{r.name}</h3>
-              <p className="text-sm text-gray-500">{r.role}</p>
-
-              <p className="mt-4 text-gray-600">{r.message}</p>
             </div>
-          </div>
-        ))}
-      </Slider>
+          ))}
+        </Slider>
+      </Container>
     </div>
   );
 }
