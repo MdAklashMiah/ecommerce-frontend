@@ -1,117 +1,162 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { Menu, User, Heart, ShoppingCart } from "lucide-react";
-import Container from "./Container";
-import SearchBar from "./SearchBar";
+import React, { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
+import axios from "axios";
 
-import LoginModal from "./auth/LoginModal";
-import SignupModal from "./auth/SignupModal";
+const SignupModal = ({ isOpen, onClose, openLogin }) => {
+  const modalRef = useRef(null);
 
-const Header = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [active, setActive] = useState("HOME");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // ESC key closes modal
+  // outside click
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        setIsLoginOpen(false);
-        setIsSignupOpen(false);
+    const handler = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose();
       }
     };
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, []);
 
-  const navLinks = ["HOME", "SHOP", "COLLECTION", "CONTACT", "ABOUT US"];
+    if (isOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isOpen, onClose]);
 
-  const getPath = (link) =>
-    link === "HOME" ? "/" : `/${link.toLowerCase()}`;
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    // basic validation
+    if (!name || !email || !password) {
+      setError("All fields are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/auth/signup`,
+        { name, email, password }
+      );
+
+      onClose();
+      openLogin();
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <header className="w-full shadow-sm bg-secondary fixed top-0 left-0 z-999 pb-5">
-      <Container>
-        <div className="w-full mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/">
-            <img src="/images/logo.png" alt="logo" />
-          </Link>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-end sm:items-center justify-center">
+      <div
+        ref={modalRef}
+        className="
+          bg-white w-full
+          sm:max-w-md
+          rounded-t-2xl sm:rounded-xl
+          px-5 sm:px-6
+          py-6 sm:py-8
+          shadow-xl
+          relative
+          animate-slideUp sm:animate-fadeIn
+        "
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-black"
+          aria-label="Close signup modal"
+        >
+          <X />
+        </button>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-10 text-sm font-medium">
-            {navLinks.map((link) => (
-              <Link
-                key={link}
-                href={getPath(link)}
-                onClick={() => setActive(link)}
-                className={`relative ${
-                  active === link
-                    ? "text-white"
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                {link}
-              </Link>
-            ))}
-          </nav>
+        <h2 className="text-xl sm:text-2xl font-semibold text-center mb-5 sm:mb-6">
+          Create Account
+        </h2>
 
-          {/* Icons */}
-          <div className="flex items-center space-x-6 text-gray-200">
-            <button onClick={() => setIsLoginOpen(true)}>
-              <User className="w-5 h-5 hover:text-white" />
+        <form className="flex flex-col gap-4" onSubmit={handleSignup}>
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="
+              border px-4 py-3 rounded-lg
+              text-sm sm:text-base
+              focus:outline-none focus:ring-2 focus:ring-secondary
+            "
+            value={name}
+            autoFocus
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <input
+            type="email"
+            placeholder="Email address"
+            className="
+              border px-4 py-3 rounded-lg
+              text-sm sm:text-base
+              focus:outline-none focus:ring-2 focus:ring-secondary
+            "
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="
+              border px-4 py-3 rounded-lg
+              text-sm sm:text-base
+              focus:outline-none focus:ring-2 focus:ring-secondary
+            "
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          {error && (
+            <p className="text-red-500 text-xs sm:text-sm text-center">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="
+              bg-secondary text-white py-3 rounded-lg
+              text-sm sm:text-base font-medium
+              disabled:opacity-60 disabled:cursor-not-allowed
+              transition
+            "
+          >
+            {loading ? "Creating account..." : "Register"}
+          </button>
+
+          <p className="text-center text-xs sm:text-sm text-gray-600">
+            Already have an account?{" "}
+            <button
+              type="button"
+              className="underline font-medium hover:text-black"
+              onClick={openLogin}
+            >
+              Login
             </button>
-
-            <Heart className="w-5 h-5 hover:text-white" />
-
-            <div className="relative cursor-pointer">
-              <ShoppingCart className="w-5 h-5 hover:text-white" />
-              <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold w-4 h-4 flex items-center justify-center rounded-full">
-                3
-              </span>
-            </div>
-
-            {/* Mobile Menu */}
-            <div className="md:hidden">
-              <Menu
-                className="w-6 h-6 cursor-pointer"
-                onClick={() => setMobileOpen(true)}
-              />
-            </div>
-          </div>
-        </div>
-      </Container>
-
-      {/* Search Bar */}
-      <Container>
-        <SearchBar />
-      </Container>
-
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        openSignup={() => {
-          setIsLoginOpen(false);
-          setIsSignupOpen(true);
-        }}
-      />
-
-      {/* Signup Modal */}
-      <SignupModal
-        isOpen={isSignupOpen}
-        onClose={() => setIsSignupOpen(false)}
-        openLogin={() => {
-          setIsSignupOpen(false);
-          setIsLoginOpen(true);
-        }}
-      />
-    </header>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 };
 
-export default Header;
+export default SignupModal;

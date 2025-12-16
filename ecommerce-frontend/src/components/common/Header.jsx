@@ -1,266 +1,189 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, User, Heart, ShoppingCart, X } from "lucide-react";
-import Container from "./Container";
 import SearchBar from "./SearchBar";
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { userInfo } from "@/slices/userSlice";
-import { useRouter } from "next/navigation";
-
+import Container from "./Container";
+import LoginModal from "./auth/LoginModal";
+import SignupModal from "./auth/SignupModal";
+import { useSelector } from "react-redux";
 
 const Header = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-
-  const dispatch = useDispatch()
-  const router = useRouter()
-
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive] = useState("HOME");
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
-  const loginRef = useRef();
-  const signupRef = useRef();
+  const user = useSelector((state) => state?.userInfo?.value);
 
-  // Close on outside click
+  // ESC key closes modal & mobile menu
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        isLoginOpen &&
-        loginRef.current &&
-        !loginRef.current.contains(event.target)
-      ) {
-        setIsLoginOpen(false);
-      }
-      if (
-        isSignupOpen &&
-        signupRef.current &&
-        !signupRef.current.contains(event.target)
-      ) {
-        setIsSignupOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isLoginOpen, isSignupOpen]);
-
-  // ESC key closes modal
-  useEffect(() => {
-    function handleEsc(event) {
-      if (event.key === "Escape") {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
         setIsLoginOpen(false);
         setIsSignupOpen(false);
+        setMobileOpen(false);
       }
-    }
+    };
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, []);
 
-  let handleEmail = (e) =>{
-    setEmail(e.target.value)
-  }
-  let handlePassword = (e) =>{
-    setPassword(e.target.value)
-  }
-
-  let handleLogin = (e) => {
-    e.preventDefault();
-
-    axios.post(`${process.env.NEXT_PUBLIC_API}/auth/login`, {
-      email,
-      password
-    }).then((res)=>{
-      localStorage.setItem("token", JSON.stringify(res.data.token))
-      dispatch(userInfo(res.data.data))
-      router.push("/")
-    }).catch((err)=>{
-      console.log(err)
-    })
-  };
-
   const navLinks = ["HOME", "SHOP", "COLLECTION", "CONTACT", "ABOUT US"];
-
   const getPath = (link) => (link === "HOME" ? "/" : `/${link.toLowerCase()}`);
 
   return (
-    <header className="w-full shadow-sm bg-secondary fixed top-0 left-0 z-999 pb-5">
-      <Container>
-        <div className="w-full mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/">
-            <img src="/images/logo.png" alt="logo" />
-          </Link>
+    <>
+      <header className="w-full bg-secondary fixed top-0 left-0 z-[999] shadow-md">
+        <Container>
+          <div className="w-full px-4 sm:px-6 py-4 flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="shrink-0">
+              <img
+                src="/images/logo.png"
+                alt="logo"
+                className="h-8 sm:h-9 object-contain"
+              />
+            </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex space-x-10 text-sm font-medium text-gray-800">
-            {navLinks.map((link) => (
-              <Link
-                key={link}
-                href={getPath(link)}
-                onClick={() => setActive(link)}
-                className={`relative ${
-                  active === link
-                    ? "text-white"
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                {link}
-              </Link>
-            ))}
-          </nav>
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex space-x-10 text-sm font-medium">
+              {navLinks.map((link) => (
+                <Link
+                  key={link}
+                  href={getPath(link)}
+                  onClick={() => setActive(link)}
+                  className={`relative transition ${
+                    active === link
+                      ? "text-white"
+                      : "text-gray-300 hover:text-white"
+                  }`}
+                >
+                  {link}
+                </Link>
+              ))}
+            </nav>
 
-          {/* Icons */}
-          <div className="flex items-center space-x-6 text-gray-200">
-            <button onClick={() => setIsLoginOpen(true)}>
-              <User className="w-5 h-5 hover:text-white" />
-            </button>
+            {/* Right Icons */}
+            <div className="flex items-center space-x-4 sm:space-x-6 text-gray-200">
+              {/* User */}
+              {user ? (
+                <div className="hidden sm:flex items-center gap-2 border border-gray-500 rounded-full px-3 py-1">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm truncate max-w-[100px]">
+                    {user.name}
+                  </span>
+                </div>
+              ) : (
+                <button
+                  aria-label="Login"
+                  onClick={() => setIsLoginOpen(true)}
+                  className="hover:text-white transition"
+                >
+                  <User className="w-5 h-5" />
+                </button>
+              )}
 
-            <Heart className="w-5 h-5 hover:text-white" />
+              {/* Wishlist */}
+              <Heart className="w-5 h-5 hover:text-white transition cursor-pointer" />
 
-            <div className="relative cursor-pointer">
-              <ShoppingCart className="w-5 h-5 hover:text-white" />
-              <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold w-4 h-4 flex items-center justify-center rounded-full">
-                3
-              </span>
-            </div>
+              {/* Cart */}
+              <div className="relative cursor-pointer">
+                <ShoppingCart className="w-5 h-5 hover:text-white transition" />
+                <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold w-4 h-4 flex items-center justify-center rounded-full">
+                  3
+                </span>
+              </div>
 
-            <div className="md:hidden">
-              <Menu
-                className="w-6 h-6 cursor-pointer"
+              {/* Mobile Menu */}
+              <button
+                aria-label="Open menu"
+                className="md:hidden"
                 onClick={() => setMobileOpen(true)}
-              />
+              >
+                <Menu className="w-6 h-6" />
+              </button>
             </div>
           </div>
-        </div>
-      </Container>
+        </Container>
 
-      {/* LOGIN MODAL */}
-      {isLoginOpen && (
-        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center z-[999]">
-          <div
-            ref={loginRef}
-            className="bg-white w-full max-w-md px-6 py-8 rounded-xl shadow-xl relative"
-          >
-            <button
-              className="absolute top-3 right-3"
-              onClick={() => setIsLoginOpen(false)}
-            >
-              <X />
-            </button>
+        {/* Search Bar */}
+        <Container>
+          <div className="px-4 sm:px-6 pb-3">
+            <SearchBar />
+          </div>
+        </Container>
+      </header>
 
-            <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
-
-            <form className="flex flex-col gap-4" onSubmit={handleLogin}>
-              <input
-                type="email"
-                value={email}
-                onChange={handleEmail}
-                placeholder="Email address"
-                className="border px-4 py-3 rounded-lg"
-
+      {/* Mobile Navigation Drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm md:hidden">
+          <div className="absolute top-0 left-0 w-72 h-full bg-secondary shadow-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <img src="/images/logo.png" alt="logo" className="h-8" />
+              <X
+                className="cursor-pointer"
+                onClick={() => setMobileOpen(false)}
               />
-              <input
-                type="password"
-                value={password}
-                onChange={handlePassword}
-                placeholder="Password"
-                className="border px-4 py-3 rounded-lg"
-              />
+            </div>
 
-              <button
-                type="submit"
-                className="bg-secondary text-white py-3 rounded-lg mt-2"
-              >
-                Login
-              </button>
-
-              <p className="text-center text-sm text-gray-600">
-                No account yet?{" "}
-                <button
-                  type="button"
-                  className="underline"
+            <nav className="flex flex-col gap-4 text-sm font-medium">
+              {navLinks.map((link) => (
+                <Link
+                  key={link}
+                  href={getPath(link)}
                   onClick={() => {
-                    setIsLoginOpen(false);
-                    setIsSignupOpen(true); // 👉 Open Signup instead
+                    setActive(link);
+                    setMobileOpen(false);
                   }}
+                  className={`${
+                    active === link
+                      ? "text-white"
+                      : "text-gray-300 hover:text-white"
+                  }`}
                 >
-                  Create Account
-                </button>
-              </p>
-            </form>
+                  {link}
+                </Link>
+              ))}
+            </nav>
+
+            {!user && (
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  setIsLoginOpen(true);
+                }}
+                className="mt-8 w-full bg-white text-secondary py-2 rounded-lg font-medium"
+              >
+                Login / Register
+              </button>
+            )}
           </div>
         </div>
       )}
 
-      {/* SIGNUP MODAL */}
-      {isSignupOpen && (
-        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center z-[999]">
-          <div
-            ref={signupRef}
-            className="bg-white w-full max-w-md px-6 py-8 rounded-xl shadow-xl relative"
-          >
-            <button
-              className="absolute top-3 right-3"
-              onClick={() => setIsSignupOpen(false)}
-            >
-              <X />
-            </button>
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+        openSignup={() => {
+          setIsLoginOpen(false);
+          setIsSignupOpen(true);
+        }}
+      />
 
-            <h2 className="text-2xl font-semibold text-center mb-6">
-              Create Account
-            </h2>
-
-            <form className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="border px-4 py-3 rounded-lg"
-              />
-              <input
-                type="email"
-                placeholder="Email address"
-                className="border px-4 py-3 rounded-lg"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                className="border px-4 py-3 rounded-lg"
-              />
-
-              <button
-                type="submit"
-                className="bg-secondary text-white py-3 rounded-lg mt-2"
-              >
-                Register
-              </button>
-
-              <p className="text-center text-sm text-gray-600">
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  className="underline"
-                  onClick={() => {
-                    setIsSignupOpen(false);
-                    setIsLoginOpen(true); // back to login
-                  }}
-                >
-                  Login
-                </button>
-              </p>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <Container>
-        <SearchBar />
-      </Container>
-    </header>
+      {/* Signup Modal */}
+      <SignupModal
+        isOpen={isSignupOpen}
+        onClose={() => setIsSignupOpen(false)}
+        openLogin={() => {
+          setIsSignupOpen(false);
+          setIsLoginOpen(true);
+        }}
+      />
+    </>
   );
 };
 
