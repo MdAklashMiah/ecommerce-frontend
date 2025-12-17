@@ -1,9 +1,22 @@
-import React from "react";
+"use client"
+
+import React, { useEffect, useState } from "react";
 import Container from "../common/Container";
 import SectionTitle from "../common/SectionTitle";
 import Product from "../common/Product";
+import axios from "axios";
 
 const LatestProducts = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API}/product/latestproduct`)
+      .then((res) => {
+        setProducts(res.data.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <section className="py-24 bg-">
       <Container>
@@ -12,10 +25,9 @@ const LatestProducts = () => {
           Our top picks of the season, just for you.{" "}
         </p>
         <div className="flex justify-between w-full mt-16">
-          <Product />
-          <Product />
-          <Product />
-          <Product />
+          {products.map((item) => (
+            <Product key={item._id} product={item} />
+          ))}
         </div>
         <div className="flex justify-center mt-8">
           <button className="px-6 py-3 bg-black text-white rounded-md font-medium hover:bg-gray-800 transition">

@@ -1,14 +1,22 @@
 import Container from "@/components/common/Container";
+import Product from "@/components/common/Product";
 import Pagination from "@/components/shop/Pagination";
 import ProductCard from "@/components/shop/ProductCard";
 import ShopBanner from "@/components/shop/ShopBanner";
 import Sidebar from "@/components/shop/Sidebar";
 
-export default function ShopPage() {
+async function allProducts() {
+  let res = await fetch(`${process.env.NEXT_PUBLIC_API}/product/allproducts`);
+
+  return await res.json();
+}
+export default async function ShopPage() {
+  let { data } = await allProducts();
+  
   return (
     <main>
       <Container>
-        <ShopBanner/>
+        <ShopBanner />
         <div className="flex">
           {/* Sidebar */}
           <Sidebar />
@@ -24,31 +32,9 @@ export default function ShopPage() {
             </div>
             {/* Products Grid */}
             <div className="grid grid-cols-3 gap-8">
-              <ProductCard label="-67%" title="Calvin Shorts" price={62} />
-              <ProductCard title="Kirby T-Shirt" price={17} />
-              <ProductCard
-                label="NEW"
-                title="Cableknit Shawl"
-                price={99}
-                oldPrice={120}
-              />
-              <ProductCard
-                title="Shirt in Botanical Cheetah Print"
-                price={62}
-              />
-              <ProductCard title="Cotton Jersey T-Shirt" price={17} />
-              <ProductCard
-                label="SALE"
-                title="Zessi Dresses"
-                price={99}
-                oldPrice={120}
-              />
-              <ProductCard
-                title="Shirt in Botanical Cheetah Print"
-                price={62}
-              />
-              <ProductCard title="Cotton Jersey T-Shirt" price={17} />
-              <ProductCard title="Zessi Dresses" price={99} oldPrice={120} />
+              {data.map((item) => (
+                <Product key={item._id} product={item} />
+              ))}
             </div>
 
             {/* Pagination */}
