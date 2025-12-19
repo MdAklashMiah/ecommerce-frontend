@@ -91,10 +91,12 @@ const Header = () => {
 
               {/* Cart */}
               <div className="relative cursor-pointer">
+                <Link href={"/cart"}>
                 <ShoppingCart className="w-5 h-5 hover:text-white transition" />
                 <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-semibold w-4 h-4 flex items-center justify-center rounded-full">
                   3
                 </span>
+                </Link>
               </div>
 
               {/* Mobile Menu */}

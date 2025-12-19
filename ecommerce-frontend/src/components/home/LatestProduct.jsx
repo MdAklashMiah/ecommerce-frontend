@@ -24,7 +24,7 @@ const LatestProducts = () => {
         <p className="text-center mt-3 text-gray-600 max-w-xl mx-auto text-sm sm:text-base">
           Our top picks of the season, just for you.{" "}
         </p>
-        <div className="flex justify-between w-full mt-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-16">
           {products.map((item) => (
             <Product key={item._id} product={item} />
           ))}

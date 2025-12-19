@@ -39,7 +39,7 @@ const Banner = () => {
             <img
               src={item.image}
               alt="bannerimage"
-              className="w-full h-auto aspect-video"
+              className="w-full h-auto aspect-auto"
             />
           </div>
 
