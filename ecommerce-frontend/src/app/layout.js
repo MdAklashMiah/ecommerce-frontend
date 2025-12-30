@@ -1,31 +1,27 @@
-import { Geist, Geist_Mono } from "next/font/google";
+// src/app/layout.js
 import "./globals.css";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import ReduxProvider from "@/components/redux/ReduxProvider";
 import VerifyUser from "@/components/verify/VerifyUser";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Google Font (production-safe, Next.js 14 compatible)
+import { Inter } from "next/font/google";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata = {
   title: "E-Commerce App",
-  description: "E-Commerce App Created by next.js",
+  description: "E-Commerce App Created by Next.js",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={inter.variable}>
+      <body className="antialiased">
         <ReduxProvider>
           <VerifyUser>
             <Header />
@@ -37,3 +33,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
