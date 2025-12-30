@@ -108,6 +108,7 @@ export default function ProductView({ product }) {
       }
 
       alert("Product added to cart 🛒");
+      console.log(selectedVariant)
       router.push("/cart");
     } catch (error) {
       alert(error.message);
